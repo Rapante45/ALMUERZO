@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Hola Gimena 💕</title>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      background: linear-gradient(135deg, #ffdde1, #ee9ca7);
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      color: #5a2a2a;
+    }
+
+    .card {
+      background: white;
+      padding: 30px;
+      border-radius: 20px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+      max-width: 320px;
+    }
+
+    h1 {
+      font-size: 22px;
+      margin-bottom: 20px;
+    }
+
+    button {
+      padding: 10px 20px;
+      margin: 10px;
+      border: none;
+      border-radius: 20px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+
+    button:hover {
+      transform: scale(1.05);
+    }
+
+    .yes {
+      background-color: #ff6f91;
+      color: white;
+    }
+
+    .no {
+      background-color: #ccc;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="card">
+    <h1 id="question">Bebe ¿Podemos almorzar mañana juntos? 💕</h1>
+    <button class="yes" onclick="respuestaSi()">Sí 💖</button>
+    <button class="no" onclick="respuestaNo()">No </button>
+  </div>
+
+  <script>
+    let intentos = 0;
+
+    function respuestaSi() {
+      document.getElementById("question").innerHTML =
+        "Sabía que dirías que sí <br>Entonces te veo mañana ";
+      ocultarBotones();
+    }
+
+    function respuestaNo() {
+      intentos++;
+
+      if (intentos === 1) {
+        document.getElementById("question").innerHTML =
+          "¿Segura? Prometo llevar tu comida favorita <br><br>¿Almorzamos juntos mañana?";
+      } else if (intentos === 2) {
+        document.getElementById("question").innerHTML =
+          "Última oportunidad <br><br>¿Sí?";
+      } else {
+        document.getElementById("question").innerHTML =
+          "Está bien… <br> gracias por leer esto.<br>La invitación para ti  queda abierta "
+          "I miss you ";
+        ocultarBotones();
+      }
+    }
+
+    function ocultarBotones() {
+      const botones = document.querySelectorAll("button");
+      botones.forEach(b => b.style.display = "none");
+    }
+  </script>
+
+</body>
+</html>
