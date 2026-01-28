@@ -153,107 +153,130 @@
     </audio>
   </div>
 
-  <script>
-    let intentos = 0;
-    const q = document.getElementById("question");
-    const sub = document.getElementById("subtext");
-    const btns = document.getElementById("btns");
-    const btnYes = document.getElementById("btnYes");
-    const btnNo = document.getElementById("btnNo");
+<script>
+  let intentos = 0;
+  const q = document.getElementById("question");
+  const sub = document.getElementById("subtext");
+  const btns = document.getElementById("btns");
+  const btnYes = document.getElementById("btnYes");
+  const btnNo = document.getElementById("btnNo");
 
-    const bgm = document.getElementById("bgm");
-    const musicBtn = document.getElementById("musicBtn");
-    const muteBtn = document.getElementById("muteBtn");
+  const bgm = document.getElementById("bgm");
+  const musicBtn = document.getElementById("musicBtn");
+  const muteBtn = document.getElementById("muteBtn");
 
-    let musicOn = false;
+  let musicOn = false;
 
-    // Intenta reproducir música SOLO tras interacción (clic)
-    async function toggleMusic(){
-      try{
-        if(!musicOn){
-          bgm.volume = 0.35;   // volumen suave
-          await bgm.play();
-          musicOn = true;
-          musicBtn.textContent = "🎵 Música: ON";
-          muteBtn.disabled = false;
-        }else{
-          bgm.pause();
-          musicOn = false;
-          musicBtn.textContent = "🎵 Música: OFF";
-        }
-      }catch(e){
-        // Autoplay bloqueado o archivo no encontrado
-        musicBtn.textContent = "🎵 Música: (no disponible)";
+  // 🔔 TU ENDPOINT DE FORMSPREE (PEGÁ EL TUYO AQUÍ)
+  const FORM_ENDPOINT = "https://formspree.io/f/mdagrebw";
+
+  async function toggleMusic(){
+    try{
+      if(!musicOn){
+        bgm.volume = 0.35;
+        await bgm.play();
+        musicOn = true;
+        musicBtn.textContent = "🎵 Música: ON";
+        muteBtn.disabled = false;
+      }else{
+        bgm.pause();
+        musicOn = false;
+        musicBtn.textContent = "🎵 Música: OFF";
       }
+    }catch(e){
+      musicBtn.textContent = "🎵 Música: (no disponible)";
     }
+  }
 
-    function toggleMute(){
-      bgm.muted = !bgm.muted;
-      muteBtn.textContent = bgm.muted ? "🔊" : "🔇";
+  function toggleMute(){
+    bgm.muted = !bgm.muted;
+    muteBtn.textContent = bgm.muted ? "🔊" : "🔇";
+  }
+
+  musicBtn.addEventListener("click", toggleMusic);
+  muteBtn.addEventListener("click", toggleMute);
+
+  function lanzarCorazones(){
+    for(let i=0; i<18; i++){
+      const h = document.createElement("div");
+      h.className = "heart";
+      h.textContent = Math.random() > 0.5 ? "💖" : "💗";
+      const dx = (Math.random()*260 - 130).toFixed(0) + "px";
+      const rot = (Math.random()*120 - 60).toFixed(0) + "deg";
+      const dur = (Math.random()*1.8 + 2.2).toFixed(2) + "s";
+      const size = (Math.random()*14 + 12).toFixed(0) + "px";
+      h.style.setProperty("--dx", dx);
+      h.style.setProperty("--rot", rot);
+      h.style.animationDuration = dur;
+      h.style.fontSize = size;
+      h.style.left = (Math.random()*100).toFixed(1) + "%";
+      document.body.appendChild(h);
+
+      setTimeout(()=> h.remove(), (parseFloat(dur)*1000)+200);
     }
+  }
 
-    musicBtn.addEventListener("click", toggleMusic);
-    muteBtn.addEventListener("click", toggleMute);
+  function ocultarBotones(){
+    btns.classList.add("hidden");
+  }
 
-    // Corazones cuando diga que sí
-    function lanzarCorazones(){
-      for(let i=0; i<18; i++){
-        const h = document.createElement("div");
-        h.className = "heart";
-        h.textContent = Math.random() > 0.5 ? "💖" : "💗";
-        const dx = (Math.random()*260 - 130).toFixed(0) + "px";
-        const rot = (Math.random()*120 - 60).toFixed(0) + "deg";
-        const dur = (Math.random()*1.8 + 2.2).toFixed(2) + "s";
-        const size = (Math.random()*14 + 12).toFixed(0) + "px";
-        h.style.setProperty("--dx", dx);
-        h.style.setProperty("--rot", rot);
-        h.style.animationDuration = dur;
-        h.style.fontSize = size;
-
-        // posición random horizontal
-        h.style.left = (Math.random()*100).toFixed(1) + "%";
-        document.body.appendChild(h);
-
-        setTimeout(()=> h.remove(), (parseFloat(dur)*1000)+200);
-      }
+  // ✅ Notificación a tu correo SOLO cuando presiona "Sí"
+  async function notificarSi(){
+    try{
+      await fetch(FORM_ENDPOINT, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          respuesta: "Presionó SÍ 💖",
+          fecha: new Date().toLocaleString(),
+          pagina: window.location.href,
+          navegador: navigator.userAgent
+        })
+      });
+    }catch(err){
+      // No hacemos nada para que no se note si falla
+      console.log("No se pudo notificar:", err);
     }
+  }
 
-    function ocultarBotones(){
-      btns.classList.add("hidden");
-    }
+  btnYes.addEventListener("click", async () => {
+    // Música
+    if(!musicOn) await toggleMusic();
 
-    btnYes.addEventListener("click", async () => {
-      // si la música está OFF, la activamos (mejor experiencia)
-      if(!musicOn) await toggleMusic();
+    // 🔔 Notificar
+    notificarSi(); // <- no la hacemos await para que sea instantáneo
 
-      q.innerHTML = "Gracias por darme la oportunidad 💕<br>¿me puedes responder por whatsapp si te gusto la cancion que elegi?";
-      sub.textContent = "Te quiero mucho corazon.......";
+    // Tu mensaje
+    q.innerHTML = "Gracias por darme la oportunidad 💕<br>¿me puedes responder por whatsapp si te gustó la canción que elegí?";
+    sub.textContent = "Te quiero mucho corazón...";
+    ocultarBotones();
+    lanzarCorazones();
+  });
+
+  btnNo.addEventListener("click", () => {
+    intentos++;
+
+    if (intentos === 1) {
+      q.innerHTML = "¿Segura? ";
+      sub.textContent = "Prometo que no será incómodo.";
+    } else if (intentos === 2) {
+      q.innerHTML = "Ok, última y ya no molesto ";
+      sub.textContent = "Te tengo presente siempre, Gimena.";
+    } else {
+      q.innerHTML = "Está bien… gracias por leer esto. 💗";
+      sub.innerHTML = "Si algún día te nace, aquí estoy.<br><br><b>Cuídate mucho.</b>";
       ocultarBotones();
-      lanzarCorazones();
-    });
+    }
+  });
 
-    btnNo.addEventListener("click", () => {
-      intentos++;
+  // Opcional: iniciar música con el primer clic en cualquier lado:
+  // document.addEventListener("click", () => { if(!musicOn) toggleMusic(); }, { once:true });
+</script>
 
-      if (intentos === 1) {
-        q.innerHTML = "¿Segura? ";
-        sub.textContent = "Prometo que no será incómodo.";
-      } else if (intentos === 2) {
-        q.innerHTML = "Ok, última y ya no molesto ";
-        sub.textContent = "Te tengo presente siempre Gimena ";
-      } else {
-        q.innerHTML = "Está bien… gracias por leer esto. 💗";
-        sub.innerHTML = "Si algún día te nace, aquí estoy.<br><br><b>Cuídate mucho.</b>";
-        ocultarBotones();
-      }
-    });
-
-    // Tip: también podés iniciar música con el primer clic en cualquier lado:
-    // document.addEventListener("click", () => { if(!musicOn) toggleMusic(); }, { once:true });
-  </script>
 
 </body>
 </html>
+
 
 
 
