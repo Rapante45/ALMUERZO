@@ -1,94 +1,251 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Hola Gimena 💕</title>
   <style>
-    body {
-      font-family: 'Arial', sans-serif;
-      background: linear-gradient(135deg, #ffdde1, #ee9ca7);
-      height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      text-align: center;
-      color: #5a2a2a;
+    :root{
+      --bg1:#ffdde1;
+      --bg2:#ee9ca7;
+      --text:#5a2a2a;
+      --yes:#ff6f91;
+      --no:#d9d9d9;
+      --card:#ffffff;
     }
 
-    .card {
-      background: white;
-      padding: 30px;
-      border-radius: 20px;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-      max-width: 320px;
+    *{ box-sizing:border-box; }
+
+    body{
+      margin:0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      background: linear-gradient(135deg, var(--bg1), var(--bg2));
+      min-height:100vh;
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      text-align:center;
+      color:var(--text);
+      overflow:hidden;
+      padding: 18px;
     }
 
-    h1 {
-      font-size: 22px;
-      margin-bottom: 20px;
+    .card{
+      width:min(420px, 100%);
+      background: var(--card);
+      padding: 26px 22px;
+      border-radius: 22px;
+      box-shadow: 0 14px 35px rgba(0,0,0,0.18);
+      position:relative;
+      animation: pop 420ms ease-out;
     }
 
-    button {
-      padding: 10px 20px;
-      margin: 10px;
+    @keyframes pop{
+      from{ transform: translateY(10px) scale(.98); opacity:0; }
+      to{ transform: translateY(0) scale(1); opacity:1; }
+    }
+
+    h1{
+      font-size: 20px;
+      line-height: 1.35;
+      margin: 0 0 14px;
+    }
+
+    .sub{
+      font-size: 14px;
+      opacity: .85;
+      margin: 0 0 18px;
+    }
+
+    .btns{
+      display:flex;
+      gap:10px;
+      justify-content:center;
+      flex-wrap:wrap;
+      margin-top: 10px;
+    }
+
+    button{
+      padding: 11px 18px;
       border: none;
-      border-radius: 20px;
-      font-size: 16px;
+      border-radius: 999px;
+      font-size: 15px;
       cursor: pointer;
-      transition: transform 0.2s;
+      transition: transform 0.15s, filter 0.15s;
+      user-select:none;
+    }
+    button:hover{ transform: translateY(-1px) scale(1.03); filter: brightness(1.02); }
+    button:active{ transform: scale(.98); }
+
+    .yes{ background: var(--yes); color: white; }
+    .no{ background: var(--no); color: #333; }
+
+    .row{
+      display:flex;
+      gap:10px;
+      justify-content:center;
+      margin-top: 12px;
+      flex-wrap:wrap;
     }
 
-    button:hover {
-      transform: scale(1.05);
+    .mini{
+      padding: 9px 14px;
+      font-size: 13px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.7);
+      border: 1px solid rgba(0,0,0,.06);
+      cursor:pointer;
     }
 
-    .yes {
-      background-color: #ff6f91;
-      color: white;
+    .hidden{ display:none !important; }
+
+    /* Corazones flotando */
+    .heart{
+      position:absolute;
+      left: 50%;
+      top: 110%;
+      font-size: 16px;
+      pointer-events:none;
+      opacity: 0.9;
+      animation: floatUp linear forwards;
+      filter: drop-shadow(0 6px 10px rgba(0,0,0,.1));
+    }
+    @keyframes floatUp{
+      to{
+        transform: translate(var(--dx), -120vh) rotate(var(--rot));
+        opacity: 0;
+      }
     }
 
-    .no {
-      background-color: #ccc;
+    .footerNote{
+      margin-top: 14px;
+      font-size: 12px;
+      opacity: .7;
     }
   </style>
 </head>
+
 <body>
 
-  <div class="card">
-    <h1 id="question">Bebe ¿Podemos almorzar mañana juntos? 💕</h1>
-    <button class="yes" onclick="respuestaSi()">Sí 💖</button>
-    <button class="no" onclick="respuestaNo()">No </button>
+  <div class="card" role="dialog" aria-live="polite">
+    <h1 id="question">Bebé, ¿te invito a almorzar mañana juntos? 💕</h1>
+    <p class="sub" id="subtext">Prometo que será tranqui, sin presión. Solo quería intentarlo.</p>
+
+    <div class="btns" id="btns">
+      <button class="yes" id="btnYes">Sí 💖</button>
+      <button class="no" id="btnNo">No</button>
+    </div>
+
+    <div class="row">
+      <button class="mini" id="musicBtn" aria-label="Música">🎵 Música: OFF</button>
+      <button class="mini" id="muteBtn" aria-label="Silenciar" disabled>🔇</button>
+    </div>
+
+    <div class="footerNote">Si no se reproduce, es normal: el navegador pide un clic para activar audio.</div>
+
+    <!-- Música (poné tu mp3 en el mismo folder y nombralo "song.mp3") -->
+    <audio id="bgm" preload="auto" loop>
+      <source src="song.mp3" type="audio/mpeg">
+    </audio>
   </div>
 
   <script>
     let intentos = 0;
+    const q = document.getElementById("question");
+    const sub = document.getElementById("subtext");
+    const btns = document.getElementById("btns");
+    const btnYes = document.getElementById("btnYes");
+    const btnNo = document.getElementById("btnNo");
 
-    function respuestaSi() {
-      document.getElementById("question").innerHTML =
-        "Sabía que dirías que sí <br>Entonces te veo mañana ";
-      ocultarBotones();
-    }
+    const bgm = document.getElementById("bgm");
+    const musicBtn = document.getElementById("musicBtn");
+    const muteBtn = document.getElementById("muteBtn");
 
-    function respuestaNo() {
-      intentos++;
+    let musicOn = false;
 
-      if (intentos === 1) {
-        document.getElementById("question").innerHTML =
-          "¿Segura? llevare tu comida favorita <br><br>¿Almorzamos juntos mañana?";
-      } else if (intentos === 2) {
-        document.getElementById("question").innerHTML =
-          "Última oportunidad <br><br>¿Sí?";
-      } else {
-        document.getElementById("question").innerHTML =
-          "Está bien… <br> gracias por leer esto.<br>La invitación para ti  queda abierta <br>I miss you ";
-        ocultarBotones();
+    // Intenta reproducir música SOLO tras interacción (clic)
+    async function toggleMusic(){
+      try{
+        if(!musicOn){
+          bgm.volume = 0.35;   // volumen suave
+          await bgm.play();
+          musicOn = true;
+          musicBtn.textContent = "🎵 Música: ON";
+          muteBtn.disabled = false;
+        }else{
+          bgm.pause();
+          musicOn = false;
+          musicBtn.textContent = "🎵 Música: OFF";
+        }
+      }catch(e){
+        // Autoplay bloqueado o archivo no encontrado
+        musicBtn.textContent = "🎵 Música: (no disponible)";
       }
     }
 
-    function ocultarBotones() {
-      const botones = document.querySelectorAll("button");
-      botones.forEach(b => b.style.display = "none");
+    function toggleMute(){
+      bgm.muted = !bgm.muted;
+      muteBtn.textContent = bgm.muted ? "🔊" : "🔇";
     }
+
+    musicBtn.addEventListener("click", toggleMusic);
+    muteBtn.addEventListener("click", toggleMute);
+
+    // Corazones cuando diga que sí
+    function lanzarCorazones(){
+      for(let i=0; i<18; i++){
+        const h = document.createElement("div");
+        h.className = "heart";
+        h.textContent = Math.random() > 0.5 ? "💖" : "💗";
+        const dx = (Math.random()*260 - 130).toFixed(0) + "px";
+        const rot = (Math.random()*120 - 60).toFixed(0) + "deg";
+        const dur = (Math.random()*1.8 + 2.2).toFixed(2) + "s";
+        const size = (Math.random()*14 + 12).toFixed(0) + "px";
+        h.style.setProperty("--dx", dx);
+        h.style.setProperty("--rot", rot);
+        h.style.animationDuration = dur;
+        h.style.fontSize = size;
+
+        // posición random horizontal
+        h.style.left = (Math.random()*100).toFixed(1) + "%";
+        document.body.appendChild(h);
+
+        setTimeout(()=> h.remove(), (parseFloat(dur)*1000)+200);
+      }
+    }
+
+    function ocultarBotones(){
+      btns.classList.add("hidden");
+    }
+
+    btnYes.addEventListener("click", async () => {
+      // si la música está OFF, la activamos (mejor experiencia)
+      if(!musicOn) await toggleMusic();
+
+      q.innerHTML = "Gracias por darme el chance 💕<br>¿Te paso hora y lugar por WhatsApp?";
+      sub.textContent = "Me haría ilusión verte.";
+      ocultarBotones();
+      lanzarCorazones();
+    });
+
+    btnNo.addEventListener("click", () => {
+      intentos++;
+
+      if (intentos === 1) {
+        q.innerHTML = "¿Seguro? 🥺";
+        sub.textContent = "Prometo que no será incómodo. Solo una comida tranqui.";
+      } else if (intentos === 2) {
+        q.innerHTML = "Ok, última y ya no molesto 🙈";
+        sub.textContent = "¿Te parece si lo dejamos como amigos por ahora?";
+      } else {
+        q.innerHTML = "Está bien… gracias por leer esto. 💗";
+        sub.innerHTML = "Si algún día te nace, aquí estoy.<br><br><b>Cuídate mucho.</b>";
+        ocultarBotones();
+      }
+    });
+
+    // Tip: también podés iniciar música con el primer clic en cualquier lado:
+    // document.addEventListener("click", () => { if(!musicOn) toggleMusic(); }, { once:true });
   </script>
 
 </body>
