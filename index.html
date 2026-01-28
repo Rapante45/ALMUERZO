@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Hola Gimenaa 💕</title>
+  <title>Hola Gimena 💕</title>
   <style>
     :root{
       --bg1:#ffdde1;
@@ -128,8 +128,8 @@
 <body>
 
   <div class="card" role="dialog" aria-live="polite">
-    <h1 id="question">Bebé, ¿te invito a almorzar mañana juntos? 💕</h1>
-    <p class="sub" id="subtext">Prometo que será tranqui, sin presión. Solo quería intentarlo.</p>
+    <h1 id="question">Bebé, ¿podemos vernos esta semana , Almorzar juntos? 💕</h1>
+    <p class="sub" id="subtext">Prometo que será tranquilo, sin presión. </p>
 
     <div class="btns" id="btns">
       <button class="yes" id="btnYes">Sí 💖</button>
@@ -141,7 +141,7 @@
       <button class="mini" id="muteBtn" aria-label="Silenciar" disabled>🔇</button>
     </div>
 
-    <div class="footerNote">Si no se reproduce, es normal: el navegador pide un clic para activar audio.</div>
+    <div class="footerNote">Si no se reproduce la musica es normal  esta mero raro programacion con canciones no lo  habia hecho antes </div>
 
     <!-- Música (poné tu mp3 en el mismo folder y nombralo "song.mp3") -->
     <audio id="bgm" preload="auto" loop>
@@ -222,8 +222,8 @@
       // si la música está OFF, la activamos (mejor experiencia)
       if(!musicOn) await toggleMusic();
 
-      q.innerHTML = "Gracias por darme el chance 💕<br>¿Te paso hora y lugar por WhatsApp?";
-      sub.textContent = "Me haría ilusión verte.";
+      q.innerHTML = "Gracias por darme la oportunidad 💕<br>¿me puedes responder por whatsapp si te gusto la cancion que elegi?";
+      sub.textContent = "Me hace ilusion verte.";
       ocultarBotones();
       lanzarCorazones();
     });
@@ -232,10 +232,10 @@
       intentos++;
 
       if (intentos === 1) {
-        q.innerHTML = "¿Seguro? 🥺";
+        q.innerHTML = "¿Segura? 🥺";
         sub.textContent = "Prometo que no será incómodo. Solo una comida tranqui.";
       } else if (intentos === 2) {
-        q.innerHTML = "Ok, última y ya no molesto 🙈";
+        q.innerHTML = "Ok, última y ya no molesto ";
         sub.textContent = "¿Te parece si lo dejamos como amigos por ahora?";
       } else {
         q.innerHTML = "Está bien… gracias por leer esto. 💗";
@@ -250,4 +250,5 @@
 
 </body>
 </html>
+
 
